@@ -1,0 +1,121 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blog App</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+    <script src="/logic/script.js" defer></script>
+  </head>
+  <body>
+    <div class="header">
+      <h1>Blog App</h1>
+      <nav>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <!-- <li><a href="/profile">User Profile</a></li> -->
+          <% if (isLogged === true) { %>
+          <li><a href="/logout">Logout</a></li>
+          <% } %>
+        </ul>
+      </nav>
+    </div>
+
+    <div class="container">
+      <h2>Welcome, User!</h2>
+
+      <div id="new-blog-section">
+        <button id="toggle-new-blog-form">New Blog Post</button>
+        <div id="new-blog-form" style="display: none">
+          <h3>New Blog Post</h3>
+          <form action="/postblog" method="POST">
+            <div class="form-group">
+              <label for="title">Title:</label>
+              <input type="text" id="title" name="title" required />
+            </div>
+            <div class="form-group">
+              <label for="content">Content:</label>
+              <textarea
+                id="content"
+                name="content"
+                rows="4"
+                required
+              ></textarea>
+            </div>
+            <input
+              type="hidden"
+              name="currentUid"
+              value="<%= currentUserId %>"
+            />
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <button type="submit">Post</button>
+          </form>
+        </div>
+      </div>
+
+      <h3>Recent Blog Posts</h3>
+      <div class="blog-feed">
+        <% posts.forEach(post => { %>
+        <div class="blog-post">
+          <h4><%= post.title %></h4>
+          <p><%= post.content %></p>
+          <p><%= post.createdAt %></p>
+          <p><%= post.username %></p>
+          
+          <button class="toggle-comments">Show Comments</button>
+          <!-- comment section -->
+          <div class="comment-section" style="display: none">
+            <form class="comment-form" action="/comment" method="POST">
+              <input type="hidden" name="PostUserId" value="<%= post._id %>">
+              <div class="form-group">
+                <label for="comment">Comment:</label>
+                <textarea
+                  id="comment"
+                  name="comment"
+                  rows="2"
+                  required
+                ></textarea>
+              </div>
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button type="submit">Post Comment</button>
+            </form>
+            <!-- Comment section will be dynamically populated here -->
+            <% post.comments.forEach(comment => { %>
+            <div class="comment">
+              <p><%= comment.commentText %></p>
+              <p><%= comment.commentuser %></p>
+              <p><%= comment.createdAt %></p>
+              <form action="/deletecomment" method="POST">
+                <input type="hidden" name="commentId" value="<%= comment._id %>">
+                <input type="hidden" name="commentUsername" value="<%= comment.commentuser %>">
+                <input type="hidden" name="postId" value="<%= post._id %>">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <button type="submit">Delete Comment</button>
+              </form>
+            </div>
+            <% }) %>
+            <!-- Repeat the above div for each comment -->
+          </div>
+        </div>
+        <% }) %>
+        <!-- Repeat the above div for each blog post -->
+      </div>
+      <hr/>
+    </div>
+
+    <div class="pagination">
+      <!-- <button class="prev-page">Previous</button>
+      <span class="page-numbers">Page <span class="current-page">1</span> of <span class="total-pages">5</span></span>
+      <button class="next-page">Next</button> -->
+      <a href="/?page=1">1</a>
+      <a href="/?page=2">2</a>
+      <a href="/?page=3">3</a>
+    </div>
+    
+    <div class="footer">
+      <p>&copy; 2024 Blog App. All rights reserved.</p>
+    </div>
+
+  </body>
+</html>
